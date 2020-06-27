@@ -11,7 +11,8 @@ namespace lcapis.Helpers
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseSqlite(Configuration.GetConnectionString("LCApisDatabase"));
+            options.UseLazyLoadingProxies()
+                .UseSqlite(Configuration.GetConnectionString("LCApisDatabase"));
         }
     }
 }

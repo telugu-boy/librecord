@@ -9,12 +9,15 @@ namespace lcapis.Entities
 {
     public class LCUser
     {
-        public long? ID { get; set; }
+        [Key]
+        public long? UserID { get; set; }
+        public bool IsBot { get; set; }
         public string Email { get; set; }
         public string NormalizedEmail { get; set; }
         public string Username { get; set; }
         public int Discrim { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
+        public virtual List<UserServer> UserServers { get; set; }
     }
 }

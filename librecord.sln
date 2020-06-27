@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30002.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lcapis", "lcapis\lcapis.csproj", "{336ED900-679A-40F0-96E5-B3C651309752}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lcwebclient", "lcwebclient\lcwebclient.csproj", "{FEC99D79-DE32-4AAC-803C-681A1391C669}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lcapis.Tests", "lcapis.Tests\lcapis.Tests.csproj", "{4FBE7C72-91B7-47BA-9968-00DB35626161}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{336ED900-679A-40F0-96E5-B3C651309752}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{336ED900-679A-40F0-96E5-B3C651309752}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{336ED900-679A-40F0-96E5-B3C651309752}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FEC99D79-DE32-4AAC-803C-681A1391C669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FEC99D79-DE32-4AAC-803C-681A1391C669}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FEC99D79-DE32-4AAC-803C-681A1391C669}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FEC99D79-DE32-4AAC-803C-681A1391C669}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FBE7C72-91B7-47BA-9968-00DB35626161}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FBE7C72-91B7-47BA-9968-00DB35626161}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FBE7C72-91B7-47BA-9968-00DB35626161}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FBE7C72-91B7-47BA-9968-00DB35626161}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

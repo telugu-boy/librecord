@@ -74,8 +74,8 @@ namespace lcapis
                     OnTokenValidated = context =>
                     {
                         var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                        var userId = int.Parse(context.Principal.Identity.Name);
-                        var user = userService.GetById(userId);
+                        var userId = long.Parse(context.Principal.Identity.Name);
+                        var user = userService.GetByUserID(userId);
                         if (user == null)
                         {
                             // return unauthorized if user no longer exists
@@ -97,17 +97,19 @@ namespace lcapis
 
             // configure DI for application services
             services.AddScoped<IUserService, LCUserService>();
+            //configure server service
+            services.AddScoped<IServerService, LCServerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, LCProdDbContext dataContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, LCProdDbContext dbContext)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            dataContext.Database.Migrate();
+            dbContext.Database.Migrate();
 
             app.UseHttpsRedirection();
 

@@ -1,18 +1,17 @@
-﻿using System;
+﻿using lcapis.Entities;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace lcapis.Models.LCUsers
 {
-    public class RegisterModel
+    public class UpdateUserModel
     {
-        [Required]
         public string Username { get; set; }
-        [Required]
         public string Email { get; set; }
-        [Required]
         public string Password { get; set; }
+        public int Discrim { get; set; }
+        public List<LCRole> Roles { get; set; }
     }
 }

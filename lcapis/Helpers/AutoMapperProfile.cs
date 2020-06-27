@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using lcapis.Entities;
+using lcapis.Models.LCServers;
 using lcapis.Models.LCUsers;
 
 namespace lcapis.Helpers
@@ -12,9 +13,14 @@ namespace lcapis.Helpers
     {
         public AutoMapperProfile()
         {
+            //users
             CreateMap<LCUser, UserModel>();
-            CreateMap<RegisterModel, LCUser>();
-            CreateMap<UpdateModel, LCUser>();
+            CreateMap<RegisterUserModel, LCUser>();
+            CreateMap<UpdateUserModel, LCUser>();
+
+            //server
+            CreateMap<CreateServerModel, LCServer>();
+            CreateMap<JoinServerModel, LCInvite>();
         }
     }
 }

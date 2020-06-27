@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace lcapis.Entities
 {
-    public class LCMsg
+    public class LCChannel
     {
         [Key]
-        public long MsgID { get; set; }
-        public long UserID { get; set; }
         public long ChannelID { get; set; }
         public long ServerID { get; set; }
-        public string Content { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        
+        public bool IsVoice { get; set; }
+        public List<LCMsg> Messages { get; set; }
     }
 }

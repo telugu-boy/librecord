@@ -6,13 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Drawing.Printing;
+using lcapis.Utils;
 
 namespace lcapis.Services
 {
     public interface IUserService
     {
         LCUser Authenticate(string email, string password);
-        LCUser GetById(long id);
+        LCUser GetByUserID(long id);
         LCUser Create(LCUser userParam, string password);
         void Update(LCUser userParam, string password = null);
         void Delete(long id);
@@ -27,11 +29,9 @@ namespace lcapis.Services
 
         public LCUser Authenticate(string email, string password)
         {
-            email = email.ToUpper();
-
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password)) return null;
 
-            LCUser user = _context.LCUsers.SingleOrDefault(u => u.NormalizedEmail == email);
+            LCUser user = _context.LCUsers.SingleOrDefault(u => u.NormalizedEmail == email.ToUpper());
 
             if (user == null) return null;
 
@@ -43,11 +43,13 @@ namespace lcapis.Services
 
         public LCUser Create(LCUser userParam, string password)
         {
+            userParam.NormalizedEmail = userParam.Email.ToUpper();
+
             if (string.IsNullOrWhiteSpace(password))
                 throw new AppException("Password required");
 
-            if (_context.LCUsers.Any(u => u.Username == userParam.Username || u.NormalizedEmail == userParam.NormalizedEmail))
-                throw new AppException("Username is already taken");
+            if (_context.LCUsers.Any(u => u.NormalizedEmail == userParam.NormalizedEmail))
+                throw new AppException("Email is already taken");
 
             if (!Utils.InputVerifiers.IsValidEmail(userParam.Email))
                 throw new AppException("Email is not valid");
@@ -58,9 +60,20 @@ namespace lcapis.Services
             userParam.PasswordHash = passwordHash;
             userParam.PasswordSalt = passwordSalt;
 
-            userParam.NormalizedEmail = userParam.Email.ToUpper();
+            userParam.UserID = Utils.SnowflakeGeneratorSingleton.Instance.CreateId();
 
-            userParam.ID = Utils.SnowflakeGeneratorSingleton.Instance.CreateId();
+            //tries to get unique discriminator 1000 times. if not, say it's not available :D
+            int i;
+            for(i = 0; i < 1000; i++)
+            {
+                userParam.Discrim = Utils.DiscrimGenerator.GenerateDiscrim();
+                if (_context.LCUsers.Any(u => u.Discrim != userParam.Discrim))
+                    break;
+            }
+            if (i == 999)
+                throw new AppException("Too many users with that username");
+
+            userParam.IsBot = false;
 
             _context.LCUsers.Add(userParam);
             _context.SaveChanges();
@@ -71,21 +84,21 @@ namespace lcapis.Services
         public void Delete(long id)
         {
             LCUser user = _context.LCUsers.Find(id);
-            if(user != null)
+            if (user != null)
             {
                 _context.LCUsers.Remove(user);
                 _context.SaveChanges();
             }
         }
 
-        public LCUser GetById(long id)
+        public LCUser GetByUserID(long id)
         {
             return _context.LCUsers.Find(id);
         }
 
         public void Update(LCUser userParam, string password = null)
         {
-            LCUser user = _context.LCUsers.Find(userParam.ID);
+            LCUser user = _context.LCUsers.Find(userParam.UserID);
 
             if (user == null)
                 throw new AppException("User not found");
@@ -94,8 +107,8 @@ namespace lcapis.Services
             if (!string.IsNullOrWhiteSpace(userParam.Username) && userParam.Username != user.Username)
             {
                 // throw error if the new username is already taken
-                if (_context.LCUsers.Any(u => u.Username == userParam.Username))
-                    throw new AppException("Username is already taken");
+                if (_context.LCUsers.Any(u => u.Discrim == userParam.Discrim))
+                    throw new AppException("Username already exists with that discriminator");
 
                 user.Username = userParam.Username;
             }
@@ -109,9 +122,9 @@ namespace lcapis.Services
                 user.NormalizedEmail = userParam.Email.ToUpper();
             }
 
-            if(userParam.Discrim != user.Discrim)
+            if (userParam.Discrim != user.Discrim)
             {
-                if (_context.LCUsers.Any(u => u.Discrim == userParam.Discrim && u.Discrim == userParam.Discrim))
+                if (_context.LCUsers.Any(u => u.Discrim == userParam.Discrim))
                     throw new AppException("That discriminator is already taken");
 
                 user.Discrim = userParam.Discrim;

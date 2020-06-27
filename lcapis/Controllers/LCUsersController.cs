@@ -9,28 +9,38 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace lcapis.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth/[controller]")]
     public class LCUsersController : ControllerBase
     {
         private IUserService _userService;
         private IMapper _mapper;
+        private readonly AppSettings _appSettings;
 
         public LCUsersController(
             IUserService userService,
-            IMapper mapper)
+            IMapper mapper,
+            IOptions<AppSettings> appSettings)
         {
             _userService = userService;
             _mapper = mapper;
+            _appSettings = appSettings.Value;
+        }
+
+        public bool IsAuthorized(long id)
+        {
+            return id == long.Parse(User.Identity.Name);
         }
 
         [AllowAnonymous]
@@ -42,20 +52,20 @@ namespace lcapis.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody] AuthenticateModel model)
+        public IActionResult Authenticate([FromBody] AuthenticateUserModel model)
         {
             LCUser user = _userService.Authenticate(model.Email, model.Password);
 
             if (user == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
+                return BadRequest(new { message = "Invalid credentials" });
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWTSECRET"));
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.ID.ToString())
+                    new Claim(ClaimTypes.Name, user.UserID.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -66,15 +76,15 @@ namespace lcapis.Controllers
             // return basic user info and authentication token
             return Ok(new
             {
-                user.ID,
-                user.NormalizedEmail,
+                user.UserID,
+                user.Email,
                 Token = tokenString
             });
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterModel model)
+        public IActionResult Register([FromBody] RegisterUserModel model)
         {
             // map model to entity
             var user = _mapper.Map<LCUser>(model);
@@ -93,19 +103,23 @@ namespace lcapis.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public IActionResult GetById(long id)
         {
-            var user = _userService.GetById(id);
+            if(!IsAuthorized(id))
+                return BadRequest(new { message = "Unauthorized" });
+            var user = _userService.GetByUserID(id);
             var model = _mapper.Map<UserModel>(user);
             return Ok(model);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] UpdateModel model)
+        public IActionResult Update(long id, [FromBody] UpdateUserModel model)
         {
+            if (!IsAuthorized(id))
+                return BadRequest(new { message = "Unauthorized" });
             // map model to entity and set id
             var user = _mapper.Map<LCUser>(model);
-            user.ID = id;
+            user.UserID = id;
 
             try
             {
@@ -121,8 +135,10 @@ namespace lcapis.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(long id)
         {
+            if (!IsAuthorized(id))
+                return BadRequest(new { message = "Unauthorized" });
             _userService.Delete(id);
             return Ok();
         }

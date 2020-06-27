@@ -266,7 +266,9 @@ FakesAssemblies/
 **/appsettings.json
 **/appsettings.Development.json
 **/jwtsecret.txt
-**/*.csproj
 **/Migrations
 #development sqlite database
 **/*.db
+#temp db files
+**/*.db-shm
+**/*.db-wal

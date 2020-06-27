@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/lcusers",
+      "launchUrl": "api/servers/lcservers",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -20,7 +20,7 @@
     "lcapis": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/lcusers",
+      "launchUrl": "api/servers/lcservers",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -29,7 +29,7 @@
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/lcusers",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/servers/lcservers",
       "publishAllPorts": true,
       "useSSL": true
     }
